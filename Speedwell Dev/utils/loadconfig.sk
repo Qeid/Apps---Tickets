@@ -1,0 +1,139 @@
+on load:
+
+    load yaml "plugins/Skript/scripts/Speedwell Dev/config/config.yml" as "plugins/Skript/scripts/Speedwell Dev/config/config.yml"
+    set yaml value "token" from "plugins/Skript/scripts/Speedwell Dev/config/config.yml" to "" if {token::dev::apps} is not set
+    set yaml value "bot" from "plugins/Skript/scripts/Speedwell Dev/config/config.yml" to "" if {botname::dev::apps} is not set
+    set yaml value "guild" from "plugins/Skript/scripts/Speedwell Dev/config/config.yml" to "" if {guildid::dev::apps} is not set
+    set {botname::dev::apps} to true
+    set {token::dev::apps} to true
+    set {guildid::dev::apps} to true
+
+    save yaml "plugins/Skript/scripts/Speedwell Dev/config/config.yml"
+
+
+
+
+
+
+command /resetDevConfig:
+    permission: op
+    trigger:
+        delete {token::dev::apps}
+        delete {botname::dev::apps}
+        delete {guildid::dev::apps}
+        send "Resetted config for &f&nSpeedwell Dev&f Bot"
+        execute console command "sk reload Speedwell Dev/"
+
+options:
+    guild: "966005053670457415"
+    bot: "Speedwell Dev"
+
+
+function devnewSlash(n: string, d: string) :: object:
+    set {_nslash} to new slash command named "%{_n}%" with desc {_d}
+    return {_nslash}
+
+function devnewOption_Slash(v: object, n: string, d: string, t: string="string", o: boolean=false):
+    if {_t} = "string":
+        if {_o} = false:
+            add required string option named "%{_n}%" with description "%{_d}%" to options of {_v}
+        
+        else:
+            add string option named "%{_n}%" with description "%{_d}%" to options of {_v}
+
+    if {_t} = "boolean":
+        if {_o} = false:
+            add required boolean option named "%{_n}%" with description "%{_d}%" to options of {_v}
+        
+        else:
+            add boolean option named "%{_n}%" with description "%{_d}%" to options of {_v}
+
+    if {_t} = "user":
+        if {_o} = false:
+            add required user option named "%{_n}%" with description "%{_d}%" to options of {_v}
+        
+        else:
+            add user option named "%{_n}%" with description "%{_d}%" to options of {_v}
+    
+    if {_t} = "integer":
+        if {_o} = false:
+            add required integer option named "%{_n}%" with description "%{_d}%" to options of {_v}
+        
+        else:
+            add integer option named "%{_n}%" with description "%{_d}%" to options of {_v}
+
+    if {_t} = "number":
+        if {_o} = false:
+            add required number option named "%{_n}%" with description "%{_d}%" to options of {_v}
+        
+        else:
+            add number option named "%{_n}%" with description "%{_d}%" to options of {_v}
+    
+    if {_t} = "channel":
+        if {_o} = false:
+            add required channel option named "%{_n}%" with description "%{_d}%" to options of {_v}
+        
+        else:
+            add channel option named "%{_n}%" with description "%{_d}%" to options of {_v}
+    
+    if {_t} = "role":
+        if {_o} = false:
+            add required role option named "%{_n}%" with description "%{_d}%" to options of {_v}
+        
+        else:
+            add role option named "%{_n}%" with description "%{_d}%" to options of {_v}
+
+function devnewSubCmd_Slash(n: string, d: string) :: object:
+    set {_r} to new sub command named {_n} with description {_d}
+    return {_r}
+
+function devaddSlash_Local(slash: object, name: string):
+
+    delete {slashdev.Local::%{_name}%}
+    set {slashdev.Local::%{_name}%} to {_slash}
+
+    update command {slashdev.Local::*} locally in guild with id {@guild}
+
+function devaddSlash_Global(slash: object, name: string):
+
+    delete {slashdev.Global::%{_name}%}
+    set {slashdev.Global::%{_name}%} to {_slash}
+
+    update command {slashdev.Global::*} globally in bot {@bot}
+
+function devtimespanFormat(value: timespan) :: text:
+    set {_str} to "%{_value}%"
+    set {_l::*} to split {_str} at " "
+    loop {_l::*}:
+        delete {_i}
+        set {_i} to loop-value parsed as a number
+        {_i} is set
+        set {_i} to round({_i})
+        replace every "%loop-value%" in {_str} with "%{_i}%"
+
+        replace every " seconds" in {_str} with " secs"
+        replace every " second" in {_str} with " sec"
+
+        replace every " minutes" in {_str} with " mins"
+        replace every " minute" in {_str} with " min"
+
+        replace every " hours" in {_str} with " hrs"
+        replace every " hour" in {_str} with " hr"
+
+        replace every " days" in {_str} with " days"
+        replace every " day" in {_str} with " day"
+        replace every " and" in {_str} with ""
+
+    return "%{_str}%"
+
+function devtoTimespan(t: text) :: timespan:
+    set {_conversion::s} to "SECONDS"
+    set {_conversion::m} to "MINUTES"
+    set {_conversion::h} to "HOURS"
+    set {_conversion::d} to "DAYS"
+    set {_l} to length of {_t}
+    set {_a} to {_l} - 1
+    set {_l::1} to first {_a} characters of {_t}
+    set {_l::2} to last character of {_t}
+    set {_t} to "%{_l::1}% %{_conversion::%{_l::2}%}%"
+    return ({_t} parsed as timespan)

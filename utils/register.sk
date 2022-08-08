@@ -1,0 +1,65 @@
+on load:
+    load yaml "plugins/Skript/scripts/Apps And Tickets/config/config.yml" as "plugins/Skript/scripts/Apps And Tickets/config/config.yml"
+
+define new bot named "%yaml value "bot" from "plugins/Skript/scripts/Apps And Tickets/config/config.yml"%":
+    token: "%yaml value "token" from "plugins/Skript/scripts/Apps And Tickets/config/config.yml"%"
+    intents: default intents
+    policy: all
+    auto reconnect: true
+    compression: none
+    on guild ready:
+        set {_c} to newSlash("ticket", "test")
+
+        set {_sub} to newSubCmd_Slash("sendmessage", "Sends the button that allows members to create a ticket")
+        set {_sub2} to newSubCmd_Slash("close", "Close a ticket")
+
+        set {_sub3} to newSubCmd_Slash("transcriptchannel", "Set the channel that ticket transcripts will be sent to")
+        newOption_Slash({_sub3}, "channel", "Please supply a channel you qt <3", "channel", false)
+
+        set {_sub4} to newSubCmd_Slash("blacklistrole", "Set the role that people cannot make tickets with")
+        newOption_Slash({_sub4}, "role", "Please supply a role you qt <3", "role", false)
+
+        set {_sub5} to newSubCmd_Slash("blacklist", "Blacklist a member from making a ticket")
+        newOption_Slash({_sub5}, "member", "Please supply a member to blacklist >:D", "user", false)
+        newOption_Slash({_sub5}, "reason", "You got to supply a reason my homeslice!", "string", false)
+
+        add {_sub} and {_sub2} and {_sub3} and {_sub4} and {_sub5} to sub commands of {_c}
+       
+        addSlash_Local({_c}, "ticket-sendmessage")
+        addSlash_Global({_c}, "ticket-all")
+        delete {_c}
+
+        set {_c} to newSlash("invite", "Invite link for Ticketing")
+        addSlash_Local({_c}, "invite")
+        addSlash_Global({_c}, "invite")
+
+on load:
+    set {_c} to newSlash("ticket", "test")
+
+    set {_sub} to newSubCmd_Slash("sendmessage", "Sends the button that allows members to create a ticket")
+    set {_sub2} to newSubCmd_Slash("close", "Close a ticket")
+
+    set {_sub3} to newSubCmd_Slash("transcriptchannel", "Set the channel that ticket transcripts will be sent to")
+    newOption_Slash({_sub3}, "channel", "Please supply a channel you qt <3", "channel", false)
+
+    set {_sub4} to newSubCmd_Slash("blacklistrole", "Set the role that people cannot make tickets with")
+    newOption_Slash({_sub4}, "role", "Please supply a role you qt <3", "role", false)
+
+    set {_sub5} to newSubCmd_Slash("blacklist", "Blacklist a member from making a ticket")
+    newOption_Slash({_sub5}, "member", "Please supply a member to blacklist >:D", "user", false)
+    newOption_Slash({_sub5}, "reason", "You got to supply a reason my homeslice!", "string", false)
+
+    add {_sub} and {_sub2} and {_sub3} and {_sub4} and {_sub5} to sub commands of {_c}
+    
+    addSlash_Local({_c}, "ticket-sendmessage")
+    addSlash_Global({_c}, "ticket-all")
+    delete {_c}
+
+    set {_c} to newSlash("invite", "Invite link for Ticketing")
+    addSlash_Local({_c}, "invite")
+    addSlash_Global({_c}, "invite")
+
+
+
+
+    

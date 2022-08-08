@@ -1,0 +1,368 @@
+# discord command !test:
+#     trigger:
+
+#         set {_text} to new text channel action in event-guild
+#         set {_category} to new category in event-guild
+
+
+#         set category name of {_category} to "test-category"
+#         create action {_category}
+
+#         set channel name of {_text} to "test-channel"
+#         set channel topic of {_text} to "test-channel-topic"
+#         set channel parent of {_text} to "Qeisy"
+
+#         create action {_text} and store it in {_echannel}
+#         reply with "> Done! %mention of {_echannel}% %{_a}%"
+
+on slash command:   
+    set {_es} to event-string
+    if {_es} = "ticket/sendmessage":
+        reply with hidden "Sending"
+        set {_row} to new components row
+        add "Click the button below to get in touch with our staff team about any problems you are experiencing." to {_line::*}
+        add "" to {_line::*}
+        make embed:
+            set title of embed to "Support"
+            set description of embed to join {_line::*} with nl
+            set embed color of embed to blue
+            set footer of embed to "Speedwell Dev"
+
+        add new primary button with id "ticket" named "New Ticket" with emoji ":envelope_with_arrow:" to components of {_row}
+        post last embed to event-channel with components {_row}
+    if {_es} = "ticket/close":
+        set {_e} to event-channel
+        set {_id} to channel topic of {_e}
+        if discord name of event-channel contains "ticket":
+            retrieve member with id "%{ticket::%discord id of event-guild%::%{_id}%::creator}%" in event-guild and store it in {_user} 
+            post "Transcript for ticket-%mention of {_user}% `%{_id}%`%nl%```%nl%%join {ticket::%discord id of event-guild%::%{_id}%::transcript::*} with nl%%nl%```" to channel with id "%{tickets::%discord id of event-guild%::transcriptchannel}%"
+            delete {ticket::%discord id of event-guild%::%{ticket::%discord id of event-guild%::%{_id}%::creator}%::used}
+            delete {ticket::%discord id of event-guild%::%{_id}%::creator}
+            delete {ticket::%discord id of event-guild%::%{_id}%::hasntPicked}
+            delete {ticket::%discord id of event-guild%::%{_id}%::transcript::*}
+            remove {_id} from {ids::%discord id of event-guild%::*}
+            destroy {_e}
+        else:
+            reply with "<:no:975777725186998323> Unable to perform that action for: `This is not a valid ticket channel!`"
+    if {_es} = "ticket/transcriptchannel":
+        set {_channel} to argument "channel" as channel
+        if argument "channel" as channel is not set:
+            reply with ":x: Unable to perform that action for: `You supplied a invalid channel!`"
+        else:
+            set {tickets::%discord id of event-guild%::transcriptchannel} to discord id of {_channel}
+            add ":white_check_mark: Transcript channel is now %mention of {_channel}%" to {_n::*}
+            make embed:
+                set author icon of embed to avatar of event-member
+                set description of embed to join {_n::*} with nl
+                set embed color of embed to blue
+                set footer of embed to "Made with <3 by Qeid"
+                set timestamp of embed to now
+            reply with last embed
+    if {_es} = "ticket/blacklistrole":
+        set {_role} to argument "role" as role
+        if argument "role" as role is not set:
+            reply with ":x: Unable to perform that action for: `You supplied a invalid role!`"
+        else:
+            set {tickets::%discord id of event-guild%::blacklistrole} to discord id of {_role}
+            add ":white_check_mark: Blacklisted role is now %mention of {_role}%" to {_n::*}
+            make embed:
+                set author icon of embed to avatar of event-member
+                set description of embed to join {_n::*} with nl
+                set embed color of embed to red
+                set footer of embed to "Made with <3 by Qeid"
+                set timestamp of embed to now
+            reply with last embed
+    if {_es} = "ticket/blacklist":
+        set {_member} to argument "member" as user
+        set {_reason} to argument "reason" as string
+        set {_role} to {tickets::%discord id of event-guild%::blacklistrole} parsed as a role
+        if {_role} is not set:
+            reply with hidden ":x: Unable to perform that action for: `Blacklist role is not set!`"
+        else:
+            add ":white_check_mark: You've blacklisted %mention of {_member}% from making tickets." to {_n::*}
+            add "" to {_n::*}
+            add "Reason: `%{_reason}%`" to {_n::*}
+            add "You can unblacklist them by running **/ticket unblacklist <member>**." to {_n::*}
+            add role with id "%{tickets::%discord id of event-guild%::blacklistrole}%" to roles of {_member}
+            make embed:
+                set author icon of embed to avatar of event-member
+                set description of embed to join {_n::*} with nl
+                set embed color of embed to blue
+                set footer of embed to "Made with <3 by Qeid"
+                set timestamp of embed to now
+            reply with last embed
+    if {_es} = "suggestion/suggestchannel":
+        set {_channel} to argument "channel" as channel
+        if argument "channel" as channel is not set:
+            reply with ":x: Unable to perform that action for: `You supplied a invalid channel!`"
+        else:
+            set {suggestion::%discord id of event-guild%::suggestchannel} to discord id of {_channel}
+            add ":white_check_mark: Suggestion channel is now %mention of {_channel}%" to {_n::*}
+            make embed:
+                set author icon of embed to avatar of event-member
+                set description of embed to join {_n::*} with nl
+                set embed color of embed to blue
+                set footer of embed to "Made with <3 by Qeid"
+                set timestamp of embed to now
+            reply with last embed
+    if {_es} = "uptime":
+        make embed:
+            set description of embed to "__**Displaying uptime and information**:robot:__"
+            add inline field named "Uptime:                      ​" with value ":clock1: %clock({seconds}, "/dd /hh /mm /ss")%" to embed
+            add inline field named "Ping:                      " with value ":ping_pong: %bot ping of event-bot% ms" to embed
+            add inline field named "Bot Status:" with value ":green_circle: Functioning" to embed
+            add inline field named "Bot Start:" with value "%{serverstart}%" to embed
+            add inline field named "                                ​" with value "" to embed
+    #			set image of embed to "https://i.postimg.cc/dVmb6skc/Player-Stats.png"
+            set footer of embed to "Requested by %event-member% | Hosted in Dallas, TX"
+            set footer icon of embed to avatar of event-member
+        reply with hidden "*Getting bot information from servers...*"
+        wait 0.5 seconds
+        post last embed to event-channel
+    if {_es} = "eval" or "evaluate":
+        if discord id of event-member != "730199667505102888":
+            reply with "You're missing permissions: `DISCORD_USER_730199667505102888`"
+        else:
+            evaluate "%argument "text" as string%" 
+            reply with hidden "Evaluated code `%argument "text" as string%`" 
+    if {_es} is "suggestion/setmodal":
+        set {_row} to new components row
+        add "Want to make a suggestion? Click the green button!" to {_line::*}
+        add "" to {_line::*}
+        make embed:
+            set title of embed to "Suggestion"
+            set description of embed to join {_line::*} with nl
+            set embed color of embed to lime
+            set footer of embed to "Speedwell Dev"
+
+        add new success button with id "suggest-modal" named "New Suggestion" with emoji ":person_raising_hand:" to components of {_row}
+        post last embed to event-channel with components {_row}
+    if {_es} is "suggest":
+        set {_w} to difference between {ti::%discord id of event-guild%::%discord id of event-user%::cooldown} and now
+        if {_w} < 3 seconds:
+            set {_value} to difference between 3 seconds and {_w}
+            set {_str} to devtimespanFormat({_value})
+            reply with hidden ":x: You can use this interaction again in **%{_str}%**"
+            stop
+
+        
+        set {_m} to new modal with id "suggestion" named "Suggestion"
+
+        set {_row1} to new components row
+
+        set {_input1} to new text input with id "suggestion" named "Suggestion"
+        set placeholder of {_input1} to "Supply a suggestion for the server!"
+        set minimum range of {_input1} to 1
+        set maximum range of {_input1} to 1500
+        set required state of {_input1} to true
+        add {_input1} to components of {_row1}
+
+        set components row of {_m} to {_row1}
+        show {_m} to the user
+
+on modal receive:
+    set {_modal} to event-string
+    if {_modal} = "suggestion":
+        set {_a::1} to value of component with id "suggestion"
+        make embed:
+            set author icon of embed to avatar of event-member
+            set description of embed to "__**New suggestion submitted**__%nl%%{_a::1}%" 
+            set embed color of embed to orange
+            set footer of embed to "Submitted by %event-member%"
+            set footer icon of embed to avatar of event-member
+        if {suggestion::%discord id of event-guild%::suggestchannel} is not set:
+            reply with ":x: %mention of event-member%: I'm unable to perform this action because: **No suggestion channel is set**"
+        else:
+            set {ti::%discord id of event-guild%::%discord id of event-user%::cooldown} to now
+            post last embed to channel with id {suggestion::%discord id of event-guild%::suggestchannel} and store it in {_a}
+            react to {_a} with emoji "white_check_mark"
+            react to {_a} with emoji "x"
+            reply with hidden ":white_check_mark: Submitted your suggestion! Check it out in <##%{suggestion::%discord id of event-guild%::suggestchannel}%>"
+
+every 1 second:
+    add 1 to {seconds}
+
+on skript unload:
+    delete {seconds}           
+
+on skript load:
+    set {serverstart} to now
+
+on button click:
+    set {_button} to event-string
+    if {_button} = "ticket":
+        if {ticket::%discord id of event-guild%::%discord id of event-user%::used} is true:
+            reply with hidden ":x: Failed to `create` a new ticket due to: `You already have a ticket open!`"
+        else if {tickets::%discord id of event-guild%::blacklistrole} is not set:
+            reply with hidden ":x: `UnknownRoleException: No role was found in %event-guild% for key (BLACKLIST)`"
+        else if event-member has discord role with id "%{tickets::%discord id of event-guild%::blacklistrole}%":
+            reply with hidden ":x: Failed to `create` a new ticket due to: `You are blacklisted from creating tickets!`"
+        else:
+            set {_text} to new text channel action in event-guild
+            set channel name of {_text} to "ticket-%discord name of event-user%"
+
+            set {_id} to "%idGenerate(5)%-%idGenerate(5)%-%idGenerate(3)%"
+            add {_id} to {ids::%discord id of event-guild%::*}
+
+            set channel topic of {_text} to "%{_id}%"
+            set channel parent of {_text} to category with id "972566665734803567"
+            
+            create action {_text} and store it in {_echannel}
+
+            add (view channel) to permissions of event-member in {_echannel}
+            #allow permission view channel to event-user in {_echannel}
+
+            set {_dropdownRow} to new components row
+            set {_dropdown} to new dropdown with id "ticket-dropdown"
+
+            set min range of {_dropdown} to 1
+            set max range of {_dropdown} to 1
+            
+            add new option with value "In-game" named "In game" with description "In-game issue such as: missing rank, server issues" with reaction "video_game" to options of {_dropdown}
+
+            add new option with value "Buycraft" named "Buycraft Issue" with description "Buycraft issues: payment didn't process, etc" with reaction "convenience_store" to options of {_dropdown}
+            add new option with value "Player-Report" named "Report a player" with description "Report a player for: bug abuse, cheating" with reaction "person_raising_hand" to options of {_dropdown}
+            add new option with value "Bug-Report" named "Report a bug" with description "Report a bug such as: economy glitch, unfair advantages" with reaction "fly" to options of {_dropdown}
+            add new option with value "Other" named "Other" with description "Another issue not listed here" with reaction "grey_question" to options of {_dropdown}
+            add {_dropdown} to components of {_dropdownRow}
+
+            reply with hidden "> Your ticket: %mention of {_echannel}%"
+
+            set {_row} to new components row
+            
+            add "__**Ticket** :ticket:__" to {_n::*}
+            add "You have created a ticket, you cannot talk till you pick a issue below." to {_n::*}
+            add "" to {_n::*}
+            add "It may take us some time to respond, but we'll get to you as soon as possible!" to {_n::*}
+            add "Please be prepared to give information about your issue." to {_n::*}
+            make embed:
+                set author icon of embed to avatar of event-member
+                set description of embed to join {_n::*} with nl
+                set embed color of embed to blue
+                set footer of embed to "Made with <3 by Qeid - ID: %channel topic of {_echannel}%"
+
+            add new secondary button with id "close" named "Close ticket" with emoji ":closed_lock_with_key:" to components of {_row}
+            post last embed to channel with id "%discord id of {_echannel}%" with components {_row} and {_dropdownRow}
+
+            
+            set {ticket::%discord id of event-guild%::%discord id of event-user%::used} to true
+            set {ticket::%discord id of event-guild%::%{_id}%::creator} to discord id of event-user
+
+    if {_button} = "close":
+        set {_e} to event-channel
+        set {_id} to channel topic of {_e}
+        retrieve member with id "%{ticket::%discord id of event-guild%::%{_id}%::creator}%" in event-guild and store it in {_user} 
+        post "Transcript for ticket-%mention of {_user}% `%{_id}%`%nl%```%nl%%join {ticket::%discord id of event-guild%::%{_id}%::transcript::*} with nl%%nl%```" to channel with id "%{tickets::%discord id of event-guild%::transcriptchannel}%"
+        delete {ticket::%discord id of event-guild%::%{ticket::%discord id of event-guild%::%{_id}%::creator}%::used}
+        delete {ticket::%discord id of event-guild%::%{_id}%::creator}
+        delete {ticket::%discord id of event-guild%::%{_id}%::hasntPicked}
+        delete {ticket::%discord id of event-guild%::%{_id}%::transcript::*}
+        remove {_id} from {ids::%discord id of event-guild%::*}
+        destroy {_e}
+    if {_button} = "suggest-modal":
+        set {_w} to difference between {ti::%discord id of event-guild%::%discord id of event-user%::cooldown} and now
+        if {_w} < 3 seconds:
+            set {_value} to difference between 3 seconds and {_w}
+            set {_str} to devtimespanFormat({_value})
+            reply with hidden ":x: You can use this interaction again in **%{_str}%**"
+            stop
+
+        
+        set {_m} to new modal with id "suggestion" named "Suggestion"
+
+        set {_row1} to new components row
+
+        set {_input1} to new text input with id "suggestion" named "Suggestion"
+        set placeholder of {_input1} to "Supply a suggestion for the server!"
+        set minimum range of {_input1} to 1
+        set maximum range of {_input1} to 1500
+        set required state of {_input1} to true
+        add {_input1} to components of {_row1}
+
+        set components row of {_m} to {_row1}
+        show {_m} to the user
+
+on message receive:
+    if discord name of event-channel contains "ticket":
+        set {_topic} to topic of event-channel
+        if {ticket::%discord id of event-guild%::%{_topic}%::hasntPicked} is not set:
+            retrieve member with id "975778023875964948" in event-guild and store it in {_user}
+            if event-member != {_user}:
+                destroy event-message
+                add "[%now%] (DELETED MESSAGE)" to {ticket::%discord id of event-guild%::%{_topic}%::transcript::*}
+            else:
+                add "[%now%] (BOT MESSAGE)" to {ticket::%discord id of event-guild%::%{_topic}%::transcript::*}
+        else:
+            add "[%now%] %discord name of event-member%: %event-message%" to {ticket::%discord id of event-guild%::%{_topic}%::transcript::*}
+
+on dropdown click:
+    set {_id} to event-string
+    if {_id} is "ticket-dropdown":
+        set {_v::*} to selected value
+        retrieve member with id "%{ticket::%discord id of event-guild%::%channel topic of event-channel%::creator}%" in event-guild and store it in {_user}
+        if {_user} != event-member:
+            reply with hidden ":x: This is not your interaction!"
+        else:
+            loop {_v::*}:
+                if loop-value = "In-game":
+                    make embed:
+                        set author icon of embed to avatar of event-member
+                        set description of embed to "**%event-member% selected:** `In Game`%nl%Please report your __ingame issue__ here."
+                        set embed color of embed to white
+                        set timestamp of embed to now
+                    reply with last embed
+                    set {ticket::%discord id of event-guild%::%channel topic of event-channel%::hasntPicked} to true
+                else if loop-value = "Buycraft":
+                    make embed:
+                        set author icon of embed to avatar of event-member
+                        set description of embed to "**%event-member% selected:** `Buycraft Issues`%nl%Please report your __buycraft__ issue."
+                        set embed color of embed to white
+                        set timestamp of embed to now
+                    reply with last embed
+                    set {ticket::%discord id of event-guild%::%channel topic of event-channel%::hasntPicked} to true
+                else if loop-value = "player-report":
+                    make embed:
+                        set author icon of embed to avatar of event-member
+                        set description of embed to "**%event-member% selected:** `Player Report`%nl%Please supply the __player name, the type of cheat, and evidence__."
+                        set embed color of embed to white
+                        set timestamp of embed to now
+                    reply with last embed
+                    set {ticket::%discord id of event-guild%::%channel topic of event-channel%::hasntPicked} to true
+                else if loop-value = "bug-report":
+                    make embed:
+                        set author icon of embed to avatar of event-member
+                        set description of embed to "**%event-member% selected:** `Bug Report`%nl%Please supply the __bug, and how to perform the bug__. %nl%*Note: you may be compensated for reporting a bug.*"
+                        set embed color of embed to white
+                        set timestamp of embed to now
+                    reply with last embed
+                    set {ticket::%discord id of event-guild%::%channel topic of event-channel%::hasntPicked} to true
+                else if loop-value = "other":
+                    make embed:
+                        set author icon of embed to avatar of event-member
+                        set description of embed to "**%event-member% selected:** `Other`%nl%Please put what you need in the ticket."
+                        set embed color of embed to white
+                        set timestamp of embed to now
+                    reply with last embed
+                    set {ticket::%discord id of event-guild%::%channel topic of event-channel%::hasntPicked} to true
+
+
+function clock(s: integer, f: text) :: text:
+	set {_m} to floor({_s} / 60)
+	remove ({_m} * 60) from {_s}
+	
+	set {_h} to floor({_m} / 60)
+	remove ({_h} * 60) from {_m}
+	
+	set {_d} to floor({_h} / 24)
+	remove ({_d} * 24) from {_h}
+	
+	set {_w} to floor({_d} / 7)
+	remove ({_w} * 7) from {_d}
+
+	
+	replace all "/s" in {_f} with "%{_s}%"
+	replace all "/m" in {_f} with "%{_m}%"
+	replace all "/h" in {_f} with "%{_h}%"
+	replace all "/d" in {_f} with "%{_d}%"
+	replace all "/w" in {_f} with "%{_w}%"
+	return {_f}

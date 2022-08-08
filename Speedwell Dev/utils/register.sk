@@ -1,0 +1,118 @@
+on load:
+    load yaml "plugins/Skript/scripts/Speedwell Dev/config/config.yml" as "plugins/Skript/scripts/Speedwell Dev/config/config.yml"
+define new bot named "%yaml value "bot" from "plugins/Skript/scripts/Speedwell Dev/config/config.yml"%":
+    token: "%yaml value "token" from "plugins/Skript/scripts/Speedwell Dev/config/config.yml"%"
+    intents: default intents
+    policy: all
+    auto reconnect: true
+    compression: none
+    on guild ready:
+        set {_c} to devnewSlash("ticket", "test")
+
+        set {_sub} to devnewSubCmd_Slash("sendmessage", "Sends the button that allows members to create a ticket")
+        set {_sub2} to devnewSubCmd_Slash("close", "Close a ticket")
+
+        set {_sub3} to devnewSubCmd_Slash("transcriptchannel", "Set the channel that ticket transcripts will be sent to")
+        devnewOption_Slash({_sub3}, "channel", "Please supply a channel you qt <3", "channel", false)
+
+        set {_sub4} to devnewSubCmd_Slash("blacklistrole", "Set the role that people cannot make tickets with")
+        devnewOption_Slash({_sub4}, "role", "Please supply a role you qt <3", "role", false)
+
+        set {_sub5} to devnewSubCmd_Slash("blacklist", "Blacklist a member from making a ticket")
+        devnewOption_Slash({_sub5}, "member", "Please supply a member to blacklist >:D", "user", false)
+        devnewOption_Slash({_sub5}, "reason", "You got to supply a reason my homeslice!", "string", false)
+
+        add {_sub} and {_sub2} and {_sub3} and {_sub4} and {_sub5} to sub commands of {_c}
+        
+        devaddSlash_Local({_c}, "ticket-sendmessage")
+        delete {_c}
+        delete {_sub} and {_sub2} and {_sub3} and {_sub4} and {_sub5}
+
+        set {_c} to devnewSlash("suggestion", "Suggestion core command")
+        set {_sub} to devnewSubCmd_Slash("suggestchannel", "The channel that suggestions will be sent to")
+        devnewOption_Slash({_sub}, "channel", "Please supply a channel you qt <3", "channel", false)
+        set {_sub1} to devnewSubCmd_Slash("setmodal", "Send the suggestion modal in the channel")
+        add {_sub} and {_sub1} to sub commands of {_c}
+        devaddSlash_Local({_c}, "suggest-channel")
+        delete {_c}
+        delete {_sub}
+
+        set {_c} to devnewSlash("uptime", "Display bot uptime and information")
+        devaddSlash_Local({_c}, "uptime")
+        delete {_c}
+
+        set {_c} to devnewSlash("eval", "Evaluate a line of code")
+        devnewOption_Slash({_c}, "text", "Line of code to eval", "string", false)
+        devaddSlash_Local({_c}, "eval")
+        delete {_c}
+
+        set {_c} to devnewSlash("evaluate", "Evaluate a line of code")
+        devnewOption_Slash({_c}, "text", "Line of code to eval", "string", false)
+        devaddSlash_Local({_c}, "evaluate")
+        delete {_c}
+
+        set {_c} to devnewSlash("suggest", "Suggest a feature!")
+        devaddSlash_Local({_c}, "suggest")
+        delete {_c}
+
+
+
+
+on load:
+    set {_c} to devnewSlash("ticket", "test")
+
+    set {_sub} to devnewSubCmd_Slash("sendmessage", "Sends the button that allows members to create a ticket")
+    set {_sub2} to devnewSubCmd_Slash("close", "Close a ticket")
+
+    set {_sub3} to devnewSubCmd_Slash("transcriptchannel", "Set the channel that ticket transcripts will be sent to")
+    devnewOption_Slash({_sub3}, "channel", "Please supply a channel you qt <3", "channel", false)
+
+    set {_sub4} to devnewSubCmd_Slash("blacklistrole", "Set the role that people cannot make tickets with")
+    devnewOption_Slash({_sub4}, "role", "Please supply a role you qt <3", "role", false)
+
+    set {_sub5} to devnewSubCmd_Slash("blacklist", "Blacklist a member from making a ticket")
+    devnewOption_Slash({_sub5}, "member", "Please supply a member to blacklist >:D", "user", false)
+    devnewOption_Slash({_sub5}, "reason", "You got to supply a reason my homeslice!", "string", false)
+
+    add {_sub} and {_sub2} and {_sub3} and {_sub4} and {_sub5} to sub commands of {_c}
+    
+    devaddSlash_Local({_c}, "ticket-sendmessage")
+    delete {_c}
+    delete {_sub} and {_sub2} and {_sub3} and {_sub4} and {_sub5}
+
+    set {_c} to devnewSlash("suggestion", "Suggestion core command")
+    set {_sub} to devnewSubCmd_Slash("suggestchannel", "The channel that suggestions will be sent to")
+    devnewOption_Slash({_sub}, "channel", "Please supply a channel you qt <3", "channel", false)
+    set {_sub1} to devnewSubCmd_Slash("setmodal", "Send the suggestion modal in the channel")
+    add {_sub} and {_sub1} to sub commands of {_c}
+    devaddSlash_Local({_c}, "suggest-channel")
+    delete {_c}
+    delete {_sub}
+
+    set {_c} to devnewSlash("uptime", "Display bot uptime and information")
+    devaddSlash_Local({_c}, "uptime")
+    delete {_c}
+
+    set {_c} to devnewSlash("eval", "Evaluate a line of code")
+    devnewOption_Slash({_c}, "text", "Line of code to eval", "string", false)
+    devaddSlash_Local({_c}, "eval")
+    delete {_c}
+
+    set {_c} to devnewSlash("evaluate", "Evaluate a line of code")
+    devnewOption_Slash({_c}, "text", "Line of code to eval", "string", false)
+    devaddSlash_Local({_c}, "evaluate")
+    delete {_c}
+
+    set {_c} to devnewSlash("suggest", "Suggest a feature!")
+    devaddSlash_Local({_c}, "suggest")
+    delete {_c}
+
+
+
+
+
+
+
+
+
+    

@@ -1,0 +1,7 @@
+function idGenerate(length: number) :: text:
+    if {_length} > 10000:
+        return "&cA value that large will crash the server!"
+    else:
+        set {_return} to random {_length} char string from `a-c-g-h-j-k-l-t-q-a-g-y-1-6-8-1-9-6`
+        set {_return} to {_return} in uppercase
+        return "%{_return}%"
